@@ -15,7 +15,7 @@ export default class InstaWeb {
         this.headers = headers;
     }
 
-    
+
 
 
     async getPostByShortCode(code: string) {
@@ -36,14 +36,15 @@ export default class InstaWeb {
 
 
     async getPage(username: string, maxId?: string, postCount: number = 12) {
-        if (!this.headers.Cookie) {
-            return new Error('You must login before accessing this page');
+        try {
+            const result = await this.axios.request({
+                method: 'get',
+                url: `https://www.instagram.com/api/v1/feed/user/${username}/username/?count=${postCount}${maxId ? `&max_id=${maxId}` : ''}`,
+                headers: this.headers,
+            })
+            return result.data.data
+        } catch (e: any) {
+            return new Error(JSON.stringify(e.response?.data));
         }
-        const result = await this.axios.request({
-            method: 'get',
-            url: `https://www.instagram.com/api/v1/feed/user/${username}/username/?count=${postCount}${maxId ? `&max_id=${maxId}` : ''}`,
-            headers: this.headers,
-        })
-        return result.data
     }
 }
